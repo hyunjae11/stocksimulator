@@ -11,12 +11,14 @@
 
 #define STOCK_COUNT 3
 
-// ==================변수 ==================
-int money = 200000;
+// ================== 변수 ==================
+int money = 500000;
 
-int price[STOCK_COUNT]     = {30000, 150000, 400000};  //기본 가격
-int min_price[STOCK_COUNT] = {5000, 50000, 180000};  //최저 가격
-int max_price[STOCK_COUNT] = {60000, 300000, 800000};  //최대 가격
+int price[STOCK_COUNT]     = {30000, 150000, 400000};  
+int prev_price[STOCK_COUNT]= {30000, 150000, 400000};  
+
+int min_price[STOCK_COUNT] = {5000, 50000, 180000};  
+int max_price[STOCK_COUNT] = {60000, 300000, 800000};  
 
 int owned[STOCK_COUNT] = {0, 0, 0};
 
@@ -24,7 +26,7 @@ int owned[STOCK_COUNT] = {0, 0, 0};
 int last_state[STOCK_COUNT] = {0, 0, 0};
 
 char stock_name[STOCK_COUNT][10] = {
-    "Netsla", "Gvidia", "BotCoin" //  주종
+    "Netsla", "Gvidia", "BotCoin"
 };
 
 time_t last_update;
@@ -37,11 +39,14 @@ void bankrupt();
 
 // ================== 주가 변동 ==================
 void update_stock() {
+
     time_t now = time(NULL);
     if (difftime(now, last_update) < 30) return;
     last_update = now;
 
     for (int i = 0; i < STOCK_COUNT; i++) {
+
+        prev_price[i] = price[i];   // 이전 가격 저장
 
         if (price[i] <= min_price[i] || price[i] >= max_price[i])
             continue;
@@ -49,19 +54,21 @@ void update_stock() {
         int r = rand() % 10 + 1;
         int dir = 0;
 
-        // 상승/하락 확률 결정
+        // 상승 / 하락 확률
         if (last_state[i] == 0) {
             if (r <= 4) dir = 1;
             else if (r <= 8) dir = -1;
-        } else if (last_state[i] == 1) {
+        } 
+        else if (last_state[i] == 1) {
             if (r <= 6) dir = 1;
             else if (r <= 9) dir = -1;
-        } else {
+        } 
+        else {
             if (r <= 3) dir = 1;
             else if (r <= 9) dir = -1;
         }
 
-        // 변동 폭 결정
+        // 변동 폭
         int event = rand() % 10 + 1;
         double rate = 0.0;
 
@@ -73,10 +80,13 @@ void update_stock() {
             rate = (rand() % 21 + 30) / 100.0;
 
         if (dir != 0) {
+
             int diff = (int)(price[i] * rate);
             price[i] += dir * diff;
             last_state[i] = dir;
-        } else {
+
+        } 
+        else {
             last_state[i] = 0;
         }
 
@@ -87,24 +97,31 @@ void update_stock() {
 
 // ================== 주가 보기 ==================
 void show_stock() {
+
     system("cls");
+
     printf("보유 자금: %d원\n\n", money);
 
-    printf("====================================\n");
-    printf("|  주종   |   주가   | 보유 수량 |\n");
-    printf("====================================\n");
+    printf("=====================================================\n");
+    printf("|  주종   |   주가   | 변동률(%%) | 보유 수량 |\n");
+    printf("=====================================================\n");
 
     for (int i = 0; i < STOCK_COUNT; i++) {
-        printf("| %-7s | %6d | %8d |\n",
-               stock_name[i], price[i], owned[i]);
+
+        double percent = ((double)(price[i] - prev_price[i]) / prev_price[i]) * 100.0;
+
+        printf("| %-7s | %7d | %+7.2f%% | %8d |\n",
+               stock_name[i], price[i], percent, owned[i]);
     }
 
-    printf("====================================\n");
+    printf("=====================================================\n");
+
     system("pause");
 }
 
 // ================== 구매 / 판매 ==================
 void buy_sell() {
+
     int sel, cnt;
 
     show_stock();
@@ -119,45 +136,66 @@ void buy_sell() {
     scanf("%d", &cnt);
 
     if (cnt > 0) {
+
         int cost = cnt * price[sel];
+
         if (money >= cost) {
+
             money -= cost;
             owned[sel] += cnt;
-        } else {
+
+        } 
+        else {
+
             printf("자금 부족!\n");
             Sleep(1000);
+
         }
+
     } 
     else if (cnt < 0) {
+
         cnt = -cnt;
+
         if (owned[sel] >= cnt) {
+
             owned[sel] -= cnt;
             money += cnt * price[sel];
-        } else {
+
+        } 
+        else {
+
             printf("보유 수량 부족!\n");
             Sleep(1000);
+
         }
     }
 }
 
 // ================== 파산 ==================
 void bankrupt() {
+
     printf("\n파산했습니다...\n");
     system("pause");
     exit(0);
+
 }
 
 // ================== 메인 ==================
 int main() {
+
     srand((unsigned)time(NULL));
     last_update = time(NULL);
 
     while (1) {
+
         update_stock();
+
         system("cls");
 
         printf("===== 주식장 =====\n");
         printf("보유 자금: %d원\n\n", money);
+
         printf("1. 주가 보기\n");
         printf("2. 주식 구매/판매\n");
         printf("3. 파산\n");
@@ -167,10 +205,12 @@ int main() {
         scanf("%d", &menu);
 
         switch (menu) {
+
             case 1: show_stock(); break;
             case 2: buy_sell(); break;
             case 3: bankrupt(); break;
             case 0: return 0;
+
         }
     }
 }
