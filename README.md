@@ -12,12 +12,12 @@
 #define STOCK_COUNT 3
 
 // ================== 변수 ==================
-int money = 500000;
+int money = 50000;
 
-int price[STOCK_COUNT]     = {30000, 150000, 400000};  
+int price[STOCK_COUNT]     = {30000, 150000, 400000};
 int prev_price[STOCK_COUNT]= {30000, 150000, 400000};  
 
-int min_price[STOCK_COUNT] = {5000, 50000, 180000};  
+int min_price[STOCK_COUNT] = {5000, 50000, 180000};
 int max_price[STOCK_COUNT] = {60000, 300000, 800000};  
 
 int owned[STOCK_COUNT] = {0, 0, 0};
